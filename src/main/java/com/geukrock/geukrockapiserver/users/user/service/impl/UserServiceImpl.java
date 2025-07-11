@@ -1,4 +1,7 @@
 package com.geukrock.geukrockapiserver.users.user.service.impl;
 
-public class UserServiceImpl {
+import com.geukrock.geukrockapiserver.users.user.service.UserService;
+
+public class UserServiceImpl implements UserService {
+
 }

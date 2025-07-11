@@ -1,1 +1,23 @@
-spring.application.name=geukrock-api-server
+server:
+  port: 8070
+  shutdown: graceful
+
+spring:
+  application:
+    name: geukrock-api-server
+
+  jpa:
+    open-in-view: false
+    properties:
+      database-platform: org.hibernate.dialect.MySQLDialect
+      hibernate:
+        format_sql: true
+        show_sql: true
+
+  servlet:
+    multipart:
+      max-file-size: 10MB
+      max-request-size: 10MB
+      
+file:
+  upload-path: /Users/jeseungwook/Documents/wook/myProject/Geukrock/local-resources
