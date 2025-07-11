@@ -1,0 +1,13 @@
+#서버 디비
+spring:
+  datasource:
+    url: jdbc:mysql://ec2-15-164-250-118.ap-northeast-2.compute.amazonaws.com:3306/geukrock?useSSL=false&serverTimezone=UTC
+    username: root
+    password: sy@1021602
+    driver-class-name: com.mysql.cj.jdbc.Driver
+  jpa:
+    hibernate:
+      ddl-auto: none
+
+file:
+  upload-path: /unbuntu/images

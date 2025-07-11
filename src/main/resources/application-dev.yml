@@ -1,0 +1,13 @@
+#로컬 디비
+spring:
+  datasource:
+    url: jdbc:mysql://localhost:3306/geukrock
+    username: root
+    password: Sy@1021602
+    driver-class-name: com.mysql.cj.jdbc.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+file:
+  upload-path: /Users/jeseungwook/Documents/wook/myProject/Geukrock/local-resources
