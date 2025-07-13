@@ -40,7 +40,7 @@ jobs:
 
         script:
           if lsof -i:8070 -t >/dev/null; then
-          kill -9 $(lsof -i:8070 -t)
+            kill -9 $(lsof -i:8070 -t)
           fi
 
           nohup bash -c "source /home/***/.bashrc && java -jar /home/***/app/target/*.jar --spring.profiles.active=prod" > /home/***/app/app.log 2>&1 &
