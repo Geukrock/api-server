@@ -38,7 +38,7 @@ jobs:
         username: ${{ secrets.SSH_USER }}
         key: ${{ secrets.SSH_KEY }}
 
-        script:
+        script: |
           if lsof -i:8070 -t >/dev/null; then
             kill -9 $(lsof -i:8070 -t)
           fi
