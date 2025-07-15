@@ -23,4 +23,20 @@ public interface DetailImageRepository extends JpaRepository<DetailImage, Long> 
 
     @Query("select max(d.sequence) from DetailImage d where d.product.id =:productId")
     Optional<Integer> findMaxSequence(@Param("productId") Long productId);
+
+    @Query("select d from DetailImage d where d.product.id = :productId and d.sequence = :sequence")
+    boolean existsDetailImagesequence(Long productId, Integer sequence);
+
+
+    @Modifying
+    @Query("UPDATE DetailImage d SET d.sequence = d.sequence + 1 WHERE d.product.id = :productId AND d.sequence >= :start AND d.sequence < :end")
+    void shiftSequenceUp(@Param("productId") Long productId,
+            @Param("start") Integer start,
+            @Param("end") Integer end);
+
+    @Modifying
+    @Query("UPDATE DetailImage d SET d.sequence = d.sequence - 1 WHERE d.product.id = :productId AND d.sequence > :start AND d.sequence <= :end")
+    void shiftSequenceDown(@Param("productId") Long productId,
+            @Param("start") Integer start,
+            @Param("end") Integer end);
 }

@@ -30,4 +30,8 @@ public class DetailImage {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "product_id")
     private Product product;
+
+    public void updateSequence(int sequence){
+        this.sequence = sequence;
+    }
 }
