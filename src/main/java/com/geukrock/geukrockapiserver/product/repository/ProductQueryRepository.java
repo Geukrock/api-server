@@ -24,6 +24,7 @@ public class ProductQueryRepository {
         .selectFrom(product)
         .leftJoin(product.detailImageUrls, detailImage).fetchJoin()
         .where(product.id.eq(productId))
+        .orderBy(detailImage.sequence.asc())
         .fetchOne();
 
         return Optional.ofNullable(result);
