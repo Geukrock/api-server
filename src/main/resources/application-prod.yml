@@ -13,4 +13,4 @@ spring:
         dialect: org.hibernate.dialect.MySQL8Dialect
 
 file:
-  upload-path: /ubuntu/app/images
+  upload-path: /home/ubuntu/app/images
