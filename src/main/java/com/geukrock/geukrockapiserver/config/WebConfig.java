@@ -33,7 +33,13 @@ public class WebConfig implements WebMvcConfigurer{
             @Override
             public void addCorsMappings(CorsRegistry registry) {
                 registry.addMapping("/**")
-                        .allowedOriginPatterns("http://localhost:[*]","http://15.164.250.118")
+                        .allowedOriginPatterns(
+                            "http://localhost:[*]",
+                            "http://15.164.250.118",
+                            "http://geukrock.com",
+                            "http://www.geukrock.com",
+                            "https://geukrock.com",
+                            "https://www.geukrock.com")
                         .allowedMethods("GET", "POST", "PUT", "DELETE")
                         .allowedHeaders("Authorization", "Content-Type")
                         .exposedHeaders("Custom-Header")
