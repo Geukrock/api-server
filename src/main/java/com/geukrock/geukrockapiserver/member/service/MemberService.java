@@ -1,15 +1,17 @@
 package com.geukrock.geukrockapiserver.member.service;
 
-import java.util.HashMap;
+import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
-
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
+import com.geukrock.geukrockapiserver.crawler.dto.CrawledMemberDto;
 import com.geukrock.geukrockapiserver.member.dto.MemberReqDto;
+import com.geukrock.geukrockapiserver.member.dto.MemberResDto;
 import com.geukrock.geukrockapiserver.member.entity.Member;
 import com.geukrock.geukrockapiserver.member.repository.MemberRepository;
 
@@ -21,16 +23,62 @@ import lombok.RequiredArgsConstructor;
 public class MemberService {
     private final MemberRepository memberRepository;
 
-    public void addMembers(List<MemberReqDto> dtos) {
-        List<Member> members = dtos.stream().map(Member::new).toList();
-        memberRepository.saveAll(members);
+    @Transactional(readOnly = true)
+    public List<MemberResDto> getMembers() {
+        List<Member> members = memberRepository.findAll();
+        return members.stream().map(MemberResDto::new).toList();
     }
 
-    public void addMember(MemberReqDto dto) {
-        memberRepository.save(new Member(dto));
-    }
+    public void syncMembers(List<CrawledMemberDto> crawledMembers) {
 
-    public void syncMembers(List<Member> crawledMembers) {
-        
+        List<Member> syncMembers = crawledMembers.stream()
+                .map(Member::new)
+                .toList();
+
+        List<Member> dbMembers = memberRepository.findAll();
+
+        // DB 멤버 맵 (key = 이름_생일)
+        Map<String, Member> dbMemberMap = dbMembers.stream()
+                .collect(Collectors.toMap(
+                        m -> m.getSomoimName() + "_" + m.getBirthDate(),
+                        Function.identity()));
+
+        Set<String> crawledKeys = syncMembers.stream()
+                .map(m -> m.getSomoimName() + "_" + m.getBirthDate())
+                .collect(Collectors.toSet());
+
+        List<Member> toAdd = new ArrayList<>();
+        List<Member> toUpdate = new ArrayList<>();
+        List<Member> toDelete = new ArrayList<>();
+
+        for (Member syncMember : syncMembers) {
+            String key = syncMember.getSomoimName() + "_" + syncMember.getBirthDate();
+
+            if (dbMemberMap.containsKey(key)) {
+                Member dbMember = dbMemberMap.get(key);
+
+                if (!syncMember.isSameContent(dbMember)) {
+                    // 같은 사람이지만 내용이 다르면 업데이트
+                    syncMember.setId(dbMember.getId()); // ID 유지
+                    toUpdate.add(syncMember);
+                }
+            } else {
+                // DB에 없으면 추가
+                syncMember.setJoinDate(LocalDate.now());
+                toAdd.add(syncMember);
+            }
+        }
+
+        // 삭제 대상: DB에 있는데, 크롤링 결과에 없는 경우
+        for (Member dbMember : dbMembers) {
+            String key = dbMember.getSomoimName() + "_" + dbMember.getBirthDate();
+            if (!crawledKeys.contains(key)) {
+                toDelete.add(dbMember);
+            }
+        }
+
+        toAdd.forEach(memberRepository::save);
+        toUpdate.forEach(memberRepository::save);
+        toDelete.forEach(memberRepository::delete);
     }
 }

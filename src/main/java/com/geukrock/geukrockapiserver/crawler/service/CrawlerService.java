@@ -8,6 +8,9 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 import org.openqa.selenium.By;
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebDriver;
@@ -17,7 +20,10 @@ import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 import org.springframework.stereotype.Service;
-import com.geukrock.geukrockapiserver.member.dto.CrawledMemberDto;
+
+import com.geukrock.geukrockapiserver.crawler.dto.CrawledMeetingDto;
+import com.geukrock.geukrockapiserver.crawler.dto.CrawledMemberDto;
+import com.geukrock.geukrockapiserver.meeting.entity.Meeting;
 import com.geukrock.geukrockapiserver.member.entity.Member;
 import io.github.bonigarcia.wdm.WebDriverManager;
 import lombok.extern.slf4j.Slf4j;
@@ -25,6 +31,7 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @Service
 public class CrawlerService {
+
     private final String geukrockUrl = "https://www.somoim.co.kr/e6104fa4-3080-11ef-9fe1-0a31a2f27e3f1";
 
     public CrawlerService() {
@@ -42,7 +49,7 @@ public class CrawlerService {
         WebDriver driver = getDriver();
         driver.get(geukrockUrl);
 
-        WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(5));
+        WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(10));
 
         // 모임 멤버 더보기 버튼 누르기
         WebElement moreButton = wait
@@ -74,11 +81,12 @@ public class CrawlerService {
             CrawledMemberDto newMember = new CrawledMemberDto();
 
             // 프로파일 이미지 url 추출
-            WebElement profileElement =  modal.findElement(By.xpath(".//img[@alt='member face']"));
+            WebElement profileElement = modal.findElement(By.xpath(".//img[@alt='member face']"));
 
             String profileUrl = profileElement.getDomAttribute("src");
             int lastDotIndex = profileUrl.lastIndexOf(".");
-            profileUrl = profileUrl.substring(0, lastDotIndex - 1) + "t" + profileUrl.substring(lastDotIndex);
+            // 프로필 url 사이즈를 정하는 값이 있는데 이것을 제거하고 저장
+            profileUrl = profileUrl.substring(0, lastDotIndex - 1) + profileUrl.substring(lastDotIndex);
             newMember.setProfileUrl(profileUrl);
             log.info("profileUrl: {}", profileUrl);
 
@@ -107,18 +115,12 @@ public class CrawlerService {
         return members;
     }
 
-    // 오늘 출석한 인원 가져오기
-    public List<CrawledMemberDto> getTodayParticipants(){
-        return null;
-    }
-
-    public void getTodayMeetingInfo(){
+    public void getTodayMeetingInfo() {
         WebDriver driver = getDriver();
         driver.get(geukrockUrl);
 
-        WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(5));
-        
-    }   
+        WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(10));
+    }
 
     public String getSomoimHtml() {
         WebDriver driver = getDriver();
@@ -237,5 +239,48 @@ public class CrawlerService {
 
         // driver.quit();
         return null;
+    }
+
+    /**
+     * 오늘자 정모 크롤링
+     */
+    public List<CrawledMeetingDto> getMeetings() {
+        WebDriver driver = getDriver();
+        driver.get(geukrockUrl);
+
+        WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(10));
+
+        WebElement sectionElement = wait.until(
+                ExpectedConditions.visibilityOfElementLocated(By.xpath("//section[h2[contains(text(),'정모 일정')]]")));
+        WebElement sectionTitle = sectionElement.findElement(By.xpath("h2[contains(text(),'정모 일정')]"));
+        int meetingCount = Integer.parseInt(sectionTitle.getText().replaceAll("\\D+", ""));
+        log.info("meetingCount: {}", meetingCount);
+        wait.until((driver1) -> {
+            int size = sectionElement.findElements(By.cssSelector("div.flex.space-x-3")).size();
+            return size >= meetingCount;
+        });
+
+        List<WebElement> meetingElements = sectionElement.findElements(By.cssSelector("div.flex.space-x-3"));
+        List<CrawledMeetingDto> meetings = new ArrayList<>();
+        for (WebElement meetingElement : meetingElements) {
+            String title = meetingElement.findElement(By.xpath(".//h3")).getText();
+            log.info("title: {}", title);
+
+            String locationText = meetingElement.findElement(
+                    By.xpath(".//img[contains(@src, 'i_location2.svg')]/../../p")).getText();
+            log.info("locationText: {}", locationText);
+
+            String dateText = meetingElement.findElement(By.xpath(
+                    ".//div[.//img[contains(@src, 'i_clock.svg')]]//p")).getText();
+            log.info("dateText: {}", dateText);
+
+            LocalDate localDate = null;
+            // 오늘/내일/모레 처리
+            if (dateText.contains("오늘")) {
+                localDate = LocalDate.now();
+                meetings.add(new CrawledMeetingDto(title, localDate, locationText));
+            }
+        }
+        return meetings;
     }
 }

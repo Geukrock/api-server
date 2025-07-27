@@ -2,6 +2,7 @@ package com.geukrock.geukrockapiserver.member.entity;
 
 import java.time.LocalDate;
 
+import com.geukrock.geukrockapiserver.crawler.dto.CrawledMemberDto;
 import com.geukrock.geukrockapiserver.member.dto.MemberReqDto;
 
 import jakarta.persistence.Column;
@@ -31,13 +32,20 @@ public class Member {
 
     String somoimName;
     LocalDate birthDate;
+    LocalDate joinDate;
 
-    @Column(name = "profile_url",unique = true)
+    @Column(name = "profile_url")
     String profileUrl;
 
-    public Member(MemberReqDto dto){
+    public Member(CrawledMemberDto dto) {
         this.somoimName = dto.getSomoimName();
         this.birthDate = dto.getBirthDate();
         this.profileUrl = dto.getProfileUrl();
+    }
+
+    public boolean isSameContent(Member member) {
+        return this.somoimName.equals(member.somoimName) &&
+                this.birthDate.equals(member.birthDate) &&
+                this.profileUrl.equals(member.profileUrl);
     }
 }

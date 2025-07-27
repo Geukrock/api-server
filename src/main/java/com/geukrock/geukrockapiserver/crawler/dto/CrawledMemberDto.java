@@ -1,4 +1,4 @@
-package com.geukrock.geukrockapiserver.member.dto;
+package com.geukrock.geukrockapiserver.crawler.dto;
 
 import java.time.LocalDate;
 
