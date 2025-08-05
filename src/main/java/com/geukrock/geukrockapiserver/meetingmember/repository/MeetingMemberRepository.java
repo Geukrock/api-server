@@ -14,6 +14,6 @@ public interface MeetingMemberRepository extends JpaRepository<MeetingMember, Lo
     @Query("select count(mm) from MeetingMember mm where mm.member.id = :memberId")
     public Integer countByMemberId(@Param("memberId") Long memberId);
 
-    @Query("select max(mm.meeting.date) from MeetingMember mm where mm.id = :memberId")
+    @Query("select max(mm.meeting.date) from MeetingMember mm where mm.member.id = :memberId")
     public LocalDate findLastJoinDateByMemberId(@Param("memberId") Long memberId);
 }
