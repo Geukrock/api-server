@@ -10,7 +10,8 @@ import java.util.stream.Collectors;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import com.geukrock.geukrockapiserver.crawler.dto.CrawledMemberDto;
-import com.geukrock.geukrockapiserver.member.dto.MemberReqDto;
+import com.geukrock.geukrockapiserver.meetingmember.repository.MeetingMemberRepository;
+import com.geukrock.geukrockapiserver.member.dto.MemberDetailResDto;
 import com.geukrock.geukrockapiserver.member.dto.MemberResDto;
 import com.geukrock.geukrockapiserver.member.entity.Member;
 import com.geukrock.geukrockapiserver.member.repository.MemberRepository;
@@ -22,6 +23,7 @@ import lombok.RequiredArgsConstructor;
 @Transactional(readOnly = false)
 public class MemberService {
     private final MemberRepository memberRepository;
+    private final MeetingMemberRepository meetingMemberRepository;
 
     @Transactional(readOnly = true)
     public List<MemberResDto> getMembers() {
@@ -29,8 +31,7 @@ public class MemberService {
         return members.stream().map(MemberResDto::new).toList();
     }
 
-    public void syncMembers(List<CrawledMemberDto> crawledMembers) {
-
+    public List<MemberDetailResDto> syncMembers(List<CrawledMemberDto> crawledMembers) {
         List<Member> syncMembers = crawledMembers.stream()
                 .map(Member::new)
                 .toList();
@@ -77,8 +78,32 @@ public class MemberService {
             }
         }
 
-        toAdd.forEach(memberRepository::save);
-        toUpdate.forEach(memberRepository::save);
-        toDelete.forEach(memberRepository::delete);
+        memberRepository.saveAll(toAdd);
+        memberRepository.saveAll(toUpdate);
+        memberRepository.deleteAll(toDelete);
+
+        return getMemberDetails();
+    }
+
+    @Transactional(readOnly = true)
+    public List<MemberDetailResDto> getMemberDetails() {
+        List<MemberDetailResDto> memberDetailResDtos = new ArrayList<>();
+
+        List<Member> members = memberRepository.findAll();
+        for (Member member : members) {
+            Integer joinCount = meetingMemberRepository.countByMemberId(member.getId());
+            LocalDate lastJoinDate = meetingMemberRepository.findLastJoinDateByMemberId(member.getId());
+
+            MemberDetailResDto memberDetailResDto = MemberDetailResDto.builder()
+                    .id(member.getId())
+                    .somoimName(member.getSomoimName())
+                    .birthDate(member.getBirthDate())
+                    .joinDate(member.getJoinDate())
+                    .profileUrl(member.getProfileUrl())
+                    .joinCount(joinCount)
+                    .LastJoinDate(lastJoinDate).build();
+            memberDetailResDtos.add(memberDetailResDto);
+        }
+        return memberDetailResDtos;
     }
 }

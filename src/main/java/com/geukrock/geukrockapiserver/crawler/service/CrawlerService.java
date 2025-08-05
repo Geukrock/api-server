@@ -11,6 +11,7 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.jspecify.annotations.Nullable;
 import org.openqa.selenium.By;
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebDriver;
@@ -20,7 +21,6 @@ import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 import org.springframework.stereotype.Service;
-
 import com.geukrock.geukrockapiserver.crawler.dto.CrawledMeetingDto;
 import com.geukrock.geukrockapiserver.crawler.dto.CrawledMemberDto;
 import com.geukrock.geukrockapiserver.meeting.entity.Meeting;
@@ -278,7 +278,22 @@ public class CrawlerService {
             // 오늘/내일/모레 처리
             if (dateText.contains("오늘")) {
                 localDate = LocalDate.now();
-                meetings.add(new CrawledMeetingDto(title, localDate, locationText));
+
+                // 이후 정모 참석 맴버 확인
+                List<WebElement> meetingMemberElements = meetingElement
+                        .findElements(By.xpath(".//img[contains(@alt, 'member face')]"));
+
+                List<String> profileUrls = new ArrayList<>();
+                for (WebElement meetingMemberElement : meetingMemberElements) {
+                    String profileUrl = meetingMemberElement.getDomAttribute("src");
+                    int lastDotIndex = profileUrl.lastIndexOf(".");
+                    // 프로필 url끝에 사이즈 지정하는 값이 있는데 이것을 제거하기
+                    profileUrl = profileUrl.substring(0, lastDotIndex - 1) + profileUrl.substring(lastDotIndex);
+                    profileUrls.add(profileUrl);
+                    log.info("profileUrl: {}", profileUrl);
+                }
+                meetings.add(new CrawledMeetingDto(title, localDate, locationText,profileUrls));
+                break;
             }
         }
         return meetings;

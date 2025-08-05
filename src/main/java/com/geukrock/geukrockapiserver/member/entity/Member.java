@@ -1,10 +1,7 @@
 package com.geukrock.geukrockapiserver.member.entity;
 
 import java.time.LocalDate;
-
 import com.geukrock.geukrockapiserver.crawler.dto.CrawledMemberDto;
-import com.geukrock.geukrockapiserver.member.dto.MemberReqDto;
-
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -29,7 +26,6 @@ public class Member {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     Long id;
-
     String somoimName;
     LocalDate birthDate;
     LocalDate joinDate;

@@ -1,1 +1,8 @@
+### 맴버 싱크
 POST http://localhost:8070/members/sync
+
+### 맴버 전체 조회
+GET http://localhost:8070/members
+
+### 맴버 디테일 전체 조회
+GET http://localhost:8070/members/detail

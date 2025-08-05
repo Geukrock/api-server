@@ -12,8 +12,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 
-
-
 @RequiredArgsConstructor
 @RestController
 @RequestMapping("/meetings")
@@ -31,7 +29,6 @@ public class MeetingController {
     public ResponseEntity<Void> syncMeetingEntity() {
         List<CrawledMeetingDto> crawledMeetings = crawlerService.getMeetings();
         meetingService.syncMeeting(crawledMeetings);
-
         return ResponseEntity.ok().build();
     }
 }

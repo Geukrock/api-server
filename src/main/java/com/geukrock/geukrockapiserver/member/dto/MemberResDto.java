@@ -16,13 +16,17 @@ import lombok.Setter;
 @Setter
 @Builder
 public class MemberResDto {
+    Long id;
     String somoimName;
     LocalDate birthDate;
+    LocalDate joinDate;
     String profileUrl;
 
     public MemberResDto(Member member){
+        this.id = member.getId();
         this.somoimName = member.getSomoimName();
         this.birthDate = member.getBirthDate();
+        this.joinDate = member.getJoinDate();
         this.profileUrl = member.getProfileUrl();
     }
 }

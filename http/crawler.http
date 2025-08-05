@@ -1,1 +1,5 @@
-GET http://localhost:8070/crawler
+### 소모임 전체 맴버 조회
+GET http://localhost:8070/crawler/members
+
+### 소모임 오늘자 정모 조회
+GET http://localhost:8070/crawler/meetings

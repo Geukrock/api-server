@@ -1,6 +1,9 @@
 package com.geukrock.geukrockapiserver.crawler.dto;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
+
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -15,5 +18,6 @@ import lombok.Setter;
 public class CrawledMeetingDto {
     String title;
     LocalDate date;
-    String location;   
+    String location;
+    List<String> joinMemberProfileUrl = new ArrayList<>();
 }

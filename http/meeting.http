@@ -1,1 +1,5 @@
+### 오늘자 정모 정보 전체조회
+GET http://localhost:8070/meetings
+
+### 오늘자 정보 정보 싱크
 POST http://localhost:8070/meetings/sync

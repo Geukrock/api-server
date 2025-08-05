@@ -1,11 +1,15 @@
 package com.geukrock.geukrockapiserver.meeting.entity;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
+
 import com.geukrock.geukrockapiserver.crawler.dto.CrawledMeetingDto;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -29,9 +33,12 @@ public class Meeting {
     LocalDate date;
     String location;
     
-    public Meeting(CrawledMeetingDto dto){
-        this.title = dto.getTitle();
-        this.date = dto.getDate();
-        this.location = dto.getLocation();
-    }
+    @OneToMany(mappedBy = "meeting")
+    List<MeetingMember> meetingMembers = new ArrayList<>();
+
+    // public Meeting(CrawledMeetingDto dto){
+    //     this.title = dto.getTitle();
+    //     this.date = dto.getDate();
+    //     this.location = dto.getLocation();
+    // }
 }
