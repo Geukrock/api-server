@@ -2,8 +2,11 @@ package com.geukrock.geukrockapiserver.member.controller;
 
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
+import com.geukrock.geukrockapiserver.crawler.dto.CrawledMeetingDto;
 import com.geukrock.geukrockapiserver.crawler.dto.CrawledMemberDto;
 import com.geukrock.geukrockapiserver.crawler.service.CrawlerService;
+import com.geukrock.geukrockapiserver.meeting.service.MeetingService;
 import com.geukrock.geukrockapiserver.member.dto.MemberDetailResDto;
 import com.geukrock.geukrockapiserver.member.dto.MemberResDto;
 import com.geukrock.geukrockapiserver.member.service.MemberService;
