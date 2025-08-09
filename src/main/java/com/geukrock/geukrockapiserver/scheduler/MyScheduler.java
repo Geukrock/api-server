@@ -19,8 +19,9 @@ public class MyScheduler {
     private final MemberService memberService;
     private final MeetingService meetingService;
 
-    @Scheduled(cron = "0 0/10 * * * *")
+    @Scheduled(cron = "0 0/2 * * * *")
     public void syncSomoimInfo() {
+        
         List<CrawledMemberDto> crawledMembers = crawlerService.getMembers();
         memberService.syncMembers(crawledMembers);
         

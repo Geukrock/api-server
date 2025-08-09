@@ -49,7 +49,7 @@ public class CrawlerService {
         WebDriver driver = getDriver();
         driver.get(geukrockUrl);
 
-        WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(10));
+        WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(30));
 
         // 모임 멤버 더보기 버튼 누르기
         WebElement moreButton = wait
@@ -112,6 +112,7 @@ public class CrawlerService {
             members.add(newMember);
             modal.findElement(By.xpath(".//button[img[@alt='close']]")).click();
         }
+        driver.quit();
         return members;
     }
 
@@ -129,7 +130,7 @@ public class CrawlerService {
         WebDriver driver = getDriver();
         driver.get(geukrockUrl);
 
-        WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(10));
+        WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(30));
 
         WebElement sectionElement = wait.until(
                 ExpectedConditions.visibilityOfElementLocated(By.xpath("//section[h2[contains(text(),'정모 일정')]]")));
@@ -177,6 +178,7 @@ public class CrawlerService {
                 break;
             }
         }
+        driver.quit();
         return meetings;
     }
 }
