@@ -16,6 +16,7 @@ public class WebConfig implements WebMvcConfigurer{
     @Value("${file.upload-path}")
     private String imageUrl;
 
+    
     @Override
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
         // /images/** 요청을 로컬 디스크 경로에 매핑
